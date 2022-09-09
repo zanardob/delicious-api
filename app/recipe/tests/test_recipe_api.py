@@ -45,6 +45,7 @@ def create_user(**params):
     """Create and return a new user."""
     return get_user_model().objects.create_user(**params)
 
+
 class PublicRecipeApiTests(TestCase):
     """Test unauthenticated API requests."""
 
@@ -167,7 +168,7 @@ class PrivateRecipeApiTests(TestCase):
 
         payload = {'user': new_user}
         url = detail_url(recipe.id)
-        self.client.patch(RECIPES_URL, payload)
+        self.client.patch(url, payload)
 
         self.assertEqual(recipe.user, self.user)
 
