@@ -281,6 +281,28 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(recipe.tags.count(), 0)
 
+    def test_filter_by_tags(self):
+        """Test filtering recipes by tags."""
+        recipe_one = create_recipe(user=self.user, title='Thai Vegetable Curry')
+        recipe_two = create_recipe(user=self.user, title='Aubergine with Tahini')
+        recipe_three = create_recipe(user=self.user, title='Fish and Chips')
+
+        tag_one = Tag.objects.create(user=self.user, name='Vegan')
+        tag_two = Tag.objects.create(user=self.user, name='Vegetarian')
+
+        recipe_one.tags.add(tag_one)
+        recipe_two.tags.add(tag_two)
+
+        params = {'tags': f'{tag_one.id},{tag_two.id}'}
+        res = self.client.get(RECIPES_URL, params)
+
+        serializer_one = RecipeSerializer(recipe_one)
+        serializer_two = RecipeSerializer(recipe_two)
+        serializer_three = RecipeSerializer(recipe_three)
+        self.assertIn(serializer_one.data, res.data)
+        self.assertIn(serializer_two.data, res.data)
+        self.assertNotIn(serializer_three.data, res.data)
+
 
 class ImageUploadTests(TestCase):
     """Tests for the image upload API."""
