@@ -218,7 +218,10 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(recipes.count(), 1)
         self.assertEqual(recipes[0].tags.count(), 2)
         for tag in payload['tags']:
-            exists = recipes[0].tags.filter(name=tag['name'], user=self.user).exists()
+            exists = recipes[0].tags.filter(
+                name=tag['name'],
+                user=self.user
+            ).exists()
             self.assertTrue(exists)
 
     def test_create_recipe_with_existing_tags(self):
@@ -238,7 +241,10 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(recipes[0].tags.count(), 2)
         self.assertIn(tag_indian, recipes[0].tags.all())
         for tag in payload['tags']:
-            exists = recipes[0].tags.filter(name=tag['name'], user=self.user).exists()
+            exists = recipes[0].tags.filter(
+                name=tag['name'],
+                user=self.user
+            ).exists()
             self.assertTrue(exists)
 
     def test_create_tag_on_update(self):
@@ -283,8 +289,14 @@ class PrivateRecipeApiTests(TestCase):
 
     def test_filter_by_tags(self):
         """Test filtering recipes by tags."""
-        recipe_one = create_recipe(user=self.user, title='Thai Vegetable Curry')
-        recipe_two = create_recipe(user=self.user, title='Aubergine with Tahini')
+        recipe_one = create_recipe(
+            user=self.user,
+            title='Thai Vegetable Curry'
+        )
+        recipe_two = create_recipe(
+            user=self.user,
+            title='Aubergine with Tahini'
+        )
         recipe_three = create_recipe(user=self.user, title='Fish and Chips')
 
         tag_one = Tag.objects.create(user=self.user, name='Vegan')
