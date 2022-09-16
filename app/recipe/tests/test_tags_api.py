@@ -1,6 +1,7 @@
 """
 Tests for the tags API.
 """
+from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import TestCase
@@ -8,7 +9,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Tag
+from core.models import Tag, Recipe
 
 from recipe.serializers import TagSerializer
 
@@ -94,3 +95,45 @@ class PrivateTagsApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         tags = Tag.objects.filter(user=self.user)
         self.assertFalse(tags.exists())
+
+    def test_filter_tags_assigned_to_recipes(self):
+        """Test listing tags to those assigned to recipes."""
+        tag_one = Tag.objects.create(user=self.user, name='Breakfast')
+        tag_two = Tag.objects.create(user=self.user, name='Lunch')
+        recipe = Recipe.objects.create(
+            title='Green Eggs on Toast',
+            time_minutes=15,
+            price=Decimal('3.30'),
+            user=self.user
+        )
+        recipe.tags.add(tag_one)
+
+        res = self.client.get(TAGS_URL, {'assigned_only': 1})
+
+        serializer_one = TagSerializer(tag_one)
+        serializer_two = TagSerializer(tag_two)
+        self.assertIn(serializer_one.data, res.data)
+        self.assertNotIn(serializer_two.data, res.data)
+
+    def test_filtered_tags_unique(self):
+        """Test filtered tags returns a unique list."""
+        tag = Tag.objects.create(user=self.user, name='Dinner')
+        Tag.objects.create(user=self.user, name='Supper')
+        recipe_one = Recipe.objects.create(
+            title='Pesto Pasta',
+            time_minutes=15,
+            price=Decimal('5.75'),
+            user=self.user
+        )
+        recipe_two = Recipe.objects.create(
+            title='Porridge',
+            time_minutes=3,
+            price=Decimal('2.90'),
+            user=self.user
+        )
+        recipe_one.tags.add(tag)
+        recipe_two.tags.add(tag)
+
+        res = self.client.get(TAGS_URL, {'assigned_only': 1})
+
+        self.assertEqual(len(res.data), 1)
