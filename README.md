@@ -6,7 +6,7 @@ The app is set up to run inside a Docker container. To start the app, execute th
 ```shell
 docker compose up
 ```
-You can then test the api by going to `localhost:8090/api/docs`. This is the path to the Swagger documentation, which lets you test all endpoints right from your browser.
+You can then test the api by going to `localhost:8000/api/docs`. This is the path to the Swagger documentation, which lets you test all endpoints right from your browser.
 
 ## Testing
 To run all unit tests, execute the following command from the project root:
