@@ -1,5 +1,4 @@
 FROM nginxinc/nginx-unprivileged:1-alpine
-LABEL maintainer="delicious-api@zanardo.dev"
 
 COPY ./default.conf.tpl /etc/nginx/default.conf.tpl
 COPY ./uwsgi_params /etc/nginx/uwsgi_params
